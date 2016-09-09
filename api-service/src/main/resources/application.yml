@@ -1,0 +1,27 @@
+AUTHORIZATION_SERVER_URL: http://localhost:9090
+server:
+  port: 8090
+
+
+security:
+  basic:
+    enabled: false
+  oauth2:
+    client:
+      accessTokenUri: ${AUTHORIZATION_SERVER_URL}/oauth/token
+      userAuthorizationUri: ${AUTHORIZATION_SERVER_URL}/oauth/authorize
+      client-id: demo
+      client-secret: demo
+      #scope: read, write
+    resource:
+      token-info-uri: ${AUTHORIZATION_SERVER_URL}/oauth/check_token
+      user-info-uri: ${AUTHORIZATION_SERVER_URL}/user
+
+
+feign:
+  hystrix:
+    enabled: false
+
+logging:
+  level:
+   com.github.bilak: DEBUG
