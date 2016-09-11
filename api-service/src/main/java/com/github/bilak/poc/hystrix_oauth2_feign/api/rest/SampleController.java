@@ -49,10 +49,10 @@ public class SampleController implements SampleService {
 	@GetMapping("/entries/another-thread")
 	public ResponseEntity<List<String>> callInAnotherThread(Principal principal) throws ExecutionException, InterruptedException {
 		logger.debug("Principal from rest {}", principal);
-		Future result = executor.submit(new SampleServiceClientCaller(sampleServiceClient));
+		Future<List<String>> result = executor.submit(new SampleServiceClientCaller(sampleServiceClient));
 		return Optional.ofNullable(result.get())
-				.map(r -> ResponseEntity.ok(r))
-				.orElse(new ResponseEntity(HttpStatus.NOT_FOUND));
+				.map(r -> ResponseEntity.ok(r))	
+				.orElse(new ResponseEntity<List<String>>(HttpStatus.NOT_FOUND));
 	}
 
 	public static class SampleServiceClientCaller implements Callable<List<String>> {
