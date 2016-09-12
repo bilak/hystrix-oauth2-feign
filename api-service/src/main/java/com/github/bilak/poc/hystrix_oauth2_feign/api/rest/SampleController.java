@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.security.Principal;
 import java.util.Arrays;
@@ -49,10 +50,28 @@ public class SampleController implements SampleService {
 	@GetMapping("/entries/another-thread")
 	public ResponseEntity<List<String>> callInAnotherThread(Principal principal) throws ExecutionException, InterruptedException {
 		logger.debug("Principal from rest {}", principal);
-		Future<List<String>> result = executor.submit(new SampleServiceClientCaller(sampleServiceClient));
+		Future<List<String>> result = executor.submit(
+				new DelegatingRequestAttributesSampleServiceClientCaller(new SampleServiceClientCaller(sampleServiceClient))
+		);
 		return Optional.ofNullable(result.get())
-				.map(r -> ResponseEntity.ok(r))	
+				.map(r -> ResponseEntity.ok(r))
 				.orElse(new ResponseEntity<List<String>>(HttpStatus.NOT_FOUND));
+	}
+
+	public static class DelegatingRequestAttributesSampleServiceClientCaller<V> implements Callable<V> {
+
+		private Callable<V> delegate;
+
+		public DelegatingRequestAttributesSampleServiceClientCaller(Callable<V> delegate) {
+			RequestContextHolder.setRequestAttributes(RequestContextHolder.currentRequestAttributes(), true);
+			this.delegate = delegate;
+		}
+
+		@Override
+		public V call() throws Exception {
+
+			return delegate.call();
+		}
 	}
 
 	public static class SampleServiceClientCaller implements Callable<List<String>> {
