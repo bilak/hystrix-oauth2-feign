@@ -22,6 +22,9 @@ feign:
   hystrix:
     enabled: true
 
+hystrix:
+  shareSecurityContext: true
+
 logging:
   level:
    com.github.bilak: DEBUG
