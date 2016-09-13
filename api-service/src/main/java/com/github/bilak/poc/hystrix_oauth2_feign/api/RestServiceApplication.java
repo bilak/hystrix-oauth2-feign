@@ -2,6 +2,7 @@ package com.github.bilak.poc.hystrix_oauth2_feign.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.filter.OrderedRequestContextFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,8 @@ public class RestServiceApplication {
 
 	@Bean
 	public RequestContextFilter requestContextFilter() {
-		return new RequestContextFilter();
+		RequestContextFilter filter = new OrderedRequestContextFilter();
+		filter.setThreadContextInheritable(true);
+		return filter;
 	}
 }
