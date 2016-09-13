@@ -28,3 +28,4 @@ hystrix:
 logging:
   level:
    com.github.bilak: DEBUG
+   org.springframework.security: DEBUG
